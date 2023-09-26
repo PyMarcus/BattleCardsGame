@@ -13,10 +13,12 @@ class Arena {
     private var playerTwo: Player = Player(cards)
 
     public fun getPlayerOne(): Player{
+        this.playerOne.setOption(1)
         return this.playerOne
     }
 
     public fun getPlayerTwo(): Player{
+        this.playerTwo.setOption(2)
         return this.playerTwo
     }
 }

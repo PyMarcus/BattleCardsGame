@@ -55,5 +55,20 @@ class Tools {
                 .filter { it.isNotBlank() }.toList()
         }
 
+        // trata entrada da escolha de jogador
+        public fun entry(): Int{
+            var entry: Int = 0
+            print(": ")
+            while(entry != 1 || entry != 2){
+                println("Please, choice 1 or 2!")
+                try{
+                    entry = readln().toInt()
+                }catch (e: Exception){
+                    continue
+                }
+            }
+            return entry
+        }
+
     }
 }

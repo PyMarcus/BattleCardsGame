@@ -9,6 +9,6 @@ import br.com.ifmg.battlecardgame.models.Player
 * do contrário, false e resultará nas penalidades estabelecidas
 * */
 interface IPlayer {
-    public fun atack(player: Player): Boolean
-    public fun defend(player: Player): Boolean
+    public fun atack(playerEnemy: Player, cardEnemy: Int): Boolean
+    public fun defend(playerEnemy: Player, enemyCard: Int): Boolean
 }

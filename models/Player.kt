@@ -1,5 +1,7 @@
 package br.com.ifmg.battlecardgame.models
 
+import java.lang.Error
+
 /*
 * Player model:
 * recebe as cartas , como uma lista de maps com categoria, card , em si
@@ -15,7 +17,7 @@ class Player(private var cards: MutableList<Map<String, Card>>) {
     private var totalCards: Int = 0
     private lateinit var cardsInGame: MutableList<Card>
     private lateinit var cardsDestroyed: MutableList<Card>
-    private var option: Int = 0
+    private var option: Int = 0 // qual player 1 or 2
 
     public fun getPunctuation(): Int{
         return this.punctuation
@@ -31,6 +33,17 @@ class Player(private var cards: MutableList<Map<String, Card>>) {
 
     public fun setTotalCards(newTotal: Int){
         this.totalCards = newTotal
+    }
+
+    public fun getCardsInGame(index: Int): Card{
+        if(index in (0 until this.cardsInGame.size)){
+            return this.cardsInGame[index]
+        }
+        throw Error("Escolha de carta incorreta")
+    }
+
+    public fun getOption(): Int{
+        return this.option
     }
 
     public fun setOption(newOption: Int){

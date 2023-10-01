@@ -3,6 +3,7 @@ package br.com.ifmg.battlecardgame.controllers.impl
 import br.com.ifmg.battlecardgame.controllers.IPlayer
 import br.com.ifmg.battlecardgame.models.Card
 import br.com.ifmg.battlecardgame.models.Player
+import java.lang.Exception
 
 class PlayerController(private val currentPlayer: Player): IPlayer {
 
@@ -26,6 +27,7 @@ class PlayerController(private val currentPlayer: Player): IPlayer {
             }
         }else{
             println("Esta carta ${currentPlayer.getCardsInGame(myCardChoose).getName()} nao esta em modo ataque.")
+            throw (Exception("Acao invalida, modo incompativel"))
         }
 
         return false
@@ -41,12 +43,13 @@ class PlayerController(private val currentPlayer: Player): IPlayer {
                 "A:${card.getAtack()} M ${card.getModeAtack()}")
         println("INFORMACOES DA CARTA player${currentPlayer.getOption()}: ${currentPlayer.getCardsInGame(myCardChoose).getName()} D:${currentPlayer.getCardsInGame(myCardChoose).getDefense()} " +
                 "A:${currentPlayer.getCardsInGame(myCardChoose).getAtack()} M ${currentPlayer.getCardsInGame(myCardChoose).getModeAtack()}")
-        if(!currentPlayer.getCardsInGame(myCardChoose).getModeAtack()){
+        if(!currentPlayer.getCardsInGame(myCardChoose).getModeAtack() && card.getModeAtack()){
             if(card.getAtack() <= currentPlayer.getCardsInGame(myCardChoose).getDefense()){
                 return true
             }
         }else{
             println("Esta carta: ${currentPlayer.getCardsInGame(myCardChoose).getName()} nao esta em modo defesa.")
+            throw (Exception("Acao invalida, modo incompativel"))
         }
         return false
     }

@@ -25,6 +25,14 @@ class DeckController(private var cards: MutableList<Map<String, Card>>): IDeck {
         return this.arenaCards.subList(0, amount)
     }
 
+    public fun toDistributeNext(next: Int): Map<String, Card>{
+        try{
+            return this.arenaCards[next]
+        }catch (e: Exception){
+            throw(Exception("Terminou o baralho"))
+        }
+    }
+
     // para a primeira vez, embaralha também.
     public fun shuffle() {
         this.cards.shuffle()

@@ -14,6 +14,7 @@ class ArenaController:AbstractArena() {
     private var arena: Arena = Arena()
     private var cards = arena.getCards()
     private var deck: DeckController = DeckController(cards)
+    private var indexNext: Int = 10
     private var newRoundP1: Boolean = false // checa se foi equipado uma carta no round vigente.
     private var newRoundP2: Boolean = false // checa se foi equipado uma carta no round vigente.
     private lateinit var playerOne: Player
@@ -86,26 +87,32 @@ class ArenaController:AbstractArena() {
                 val b = this.myCard()
                 val c = this.enemyCard()
                 val cardEnemy = this.playerTwo.getCardsInGame(c)
-               val success: Boolean =  player.atack(a,
-                   b,
-                   c)
-                if(success){
-                    println("Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setPunctuation(player.getCurrentPlayer().
-                    getCardsInGame(b).getAtack()
-                    )
-                    println("Player2 -> Pontuacao apos ataque = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setCardsDestroyed(cardEnemy)
-                    this.startNewRound()
-                }else{
-                    println("Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setPunctuation(enemy.getCurrentPlayer().
-                    getCardsInGame(c).getDefense()
-                    )
-                    println("Player1 -> Pontuacao apos ataque = ${this.playerOne.getPunctuation()}")
-                    this.playerTwo.setCardsDestroyed(player.getCurrentPlayer().
-                    getCardsInGame(b))
-                    this.startNewRound()
+                try {
+                    val success: Boolean =  player.atack(a,
+                        b,
+                        c)
+                    if(success){
+                        println("Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setPunctuation(player.getCurrentPlayer().
+                        getCardsInGame(b).getAtack()
+                        )
+                        println("Player2 -> Pontuacao apos ataque = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setCardsDestroyed(cardEnemy)
+                        this.finish()
+                        this.startNewRound()
+                    }else{
+                        println("Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setPunctuation(enemy.getCurrentPlayer().
+                        getCardsInGame(c).getDefense()
+                        )
+                        println("Player1 -> Pontuacao apos ataque = ${this.playerOne.getPunctuation()}")
+                        this.playerTwo.setCardsDestroyed(player.getCurrentPlayer().
+                        getCardsInGame(b))
+                        this.finish()
+                        this.startNewRound()
+                    }
+                }catch (e: Exception){
+                    this.playerOnesTurn(player, enemy)
                 }
             }
             2 -> {
@@ -114,28 +121,66 @@ class ArenaController:AbstractArena() {
                 val b = this.myCard()
                 val c = this.enemyCard()
                 val cardEnemy = this.playerTwo.getCardsInGame(c)
-                val success: Boolean =  player.defend(a,
-                    b,
-                    c)
-                if(success){
-                    println("1)Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setPunctuation(player.getCurrentPlayer().
-                    getCardsInGame(b).getAtack()
-                    )
-                    println("1)Player2 -> Pontuacao apos defesa = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setCardsDestroyed(cardEnemy)
-                    this.startNewRound()
-                }else{
-                    println("1)Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setPunctuation(enemy.getCurrentPlayer().
-                    getCardsInGame(c).getDefense()
-                    )
-                    println("1)Player1 -> Pontuacao apos defesa = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setCardsDestroyed(this.playerOne.getCardsInGame(b))
-                    this.startNewRound()
+                try {
+                    val success: Boolean =  player.defend(a,
+                        b,
+                        c)
+                    if(success){
+                        println("1)Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setPunctuation(player.getCurrentPlayer().
+                        getCardsInGame(b).getAtack()
+                        )
+                        println("1)Player2 -> Pontuacao apos defesa = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setCardsDestroyed(cardEnemy)
+                        this.startNewRound()
+                    }else {
+                        println("1)Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setPunctuation(
+                            enemy.getCurrentPlayer().getCardsInGame(c).getDefense()
+                        )
+                        println("1)Player1 -> Pontuacao apos defesa = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setCardsDestroyed(this.playerOne.getCardsInGame(b))
+                        this.startNewRound()
+                    }
+                    this.finish()
+                }catch (e: Exception){
+                    this.playerOnesTurn(player, enemy)
                 }
             }
             3 -> this.buildArmorP1(this.playerOne)
+            4 -> {
+                this.createBanner()
+                this.playerOnesTurn(player, enemy)
+            }
+            5 -> {
+                if(this.playerOne.getCardsOnHand().size > 0){
+                    print("Escolher: ")
+                    var option = readln().toInt()
+                    var c = playerOne.getCardsOnHand()[option]
+                    println()
+                    print("Substituir a carta:")
+                    option = readln().toInt()
+                    var cc = this.playerOne.getCardsInGame()[option]
+                    this.playerOne.setCardsDestroyed(cc)
+                    this.playerOne.getCardsInGame().add(c)
+                    this.playerOne.setCardOnHand(cc)
+                    println("Troca realizada")
+                    println("Modificar modo:")
+                    println("1-Ataque 2-Defesa")
+                    option = readln().toInt()
+                    if(option == 1){
+                        this.playerOne.getCardsInGame().last().setModeAtack(true)
+                    }else{
+                        this.playerOne.getCardsInGame().last().setModeAtack(false)
+                    }
+                    this.showPlayersCards(this.playerOne.getCardsInGame(), this.playerTwo.getCardsInGame())
+
+                }else{
+                    println("Sem cartas na mao ainda")
+                }
+                this.playerOnesTurn(player, enemy)
+            }
+            6 -> this.playerTwosTurn(this.p2C, this.p1C)
         }
     }
 
@@ -153,29 +198,32 @@ class ArenaController:AbstractArena() {
                 val b = this.myCard()
                 val c = this.enemyCard()
                 val cardEnemy = this.playerOne.getCardsInGame(c)
-                val success: Boolean =  player.atack(a,
-                    b,
-                    c)
-                if(success){
-                    println("2)Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setPunctuation(player.getCurrentPlayer().
-                    getCardsInGame(b).getAtack()
-                    )
-                    println("2)Player1 -> Pontuacao apos ataque = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setCardsDestroyed(cardEnemy)
-                    this.startNewRound()
-                }else{
-                    println("2)Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setPunctuation(enemy.getCurrentPlayer().
-                    getCardsInGame(c).getDefense()
-                    )
-                    println("2)Player2 -> Pontuacao apos ataque = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setCardsDestroyed(player.getCurrentPlayer().
-                    getCardsInGame(b))
-                    this.startNewRound()
+                try {
+                    val success: Boolean =  player.atack(a,
+                        b,
+                        c)
+                    if(success){
+                        println("2)Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setPunctuation(player.getCurrentPlayer().
+                        getCardsInGame(b).getAtack()
+                        )
+                        println("2)Player1 -> Pontuacao apos ataque = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setCardsDestroyed(cardEnemy)
+                        this.startNewRound()
+                    }else{
+                        println("2)Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setPunctuation(enemy.getCurrentPlayer().
+                        getCardsInGame(c).getDefense()
+                        )
+                        println("2)Player2 -> Pontuacao apos ataque = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setCardsDestroyed(player.getCurrentPlayer().
+                        getCardsInGame(b))
+                        this.startNewRound()
+                    }
+                    this.finish()
+                }catch (e: Exception){
+                    this.playerTwosTurn(player, enemy)
                 }
-
-
             }
             2 -> {
                 println("Em defesa")
@@ -183,29 +231,71 @@ class ArenaController:AbstractArena() {
                 val b = this.myCard()
                 val c = this.enemyCard()
                 val cardEnemy = this.playerOne.getCardsInGame(c)
-                val success: Boolean =  player.defend(a,
-                    b,
-                    c)
-                if(success){
-                    println("Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setPunctuation(player.getCurrentPlayer().
-                    getCardsInGame(b).getAtack()
-                    )
-                    println("Player1 -> Pontuacao apos defesa = ${this.playerOne.getPunctuation()}")
-                    this.playerOne.setCardsDestroyed(cardEnemy)
-                    this.startNewRound()
-                }else{
-                    println("Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setPunctuation(enemy.getCurrentPlayer().
-                    getCardsInGame(c).getDefense()
-                    )
-                    println("Player2 -> Pontuacao apos defesa = ${this.playerTwo.getPunctuation()}")
-                    this.playerTwo.setCardsDestroyed(this.playerTwo.getCardsInGame(b))
-                    this.startNewRound()
+                try {
+                    val success: Boolean =  player.defend(a,
+                        b,
+                        c)
+                    if(success){
+                        println("Player1 -> Pontuacao = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setPunctuation(player.getCurrentPlayer().
+                        getCardsInGame(b).getAtack()
+                        )
+                        println("Player1 -> Pontuacao apos defesa = ${this.playerOne.getPunctuation()}")
+                        this.playerOne.setCardsDestroyed(cardEnemy)
+                        this.startNewRound()
+                    }else {
+                        println("Player2 -> Pontuacao = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setPunctuation(
+                            enemy.getCurrentPlayer().getCardsInGame(c).getDefense()
+                        )
+                        println("Player2 -> Pontuacao apos defesa = ${this.playerTwo.getPunctuation()}")
+                        this.playerTwo.setCardsDestroyed(this.playerTwo.getCardsInGame(b))
+                        this.startNewRound()
+                    }
+                }catch (e: Exception){
+                    this.playerTwosTurn(player, enemy)
                 }
-
+                this.finish()
             }
             3 -> this.buildArmorP2(this.playerTwo)
+            4 -> {
+                this.createBanner()
+                this.playerTwosTurn(player, enemy)
+            }
+            5 -> {
+                if(this.playerTwo.getCardsOnHand().size > 0){
+                    println("Cartas na mão")
+                    for((i, card) in playerTwo.getCardsOnHand().withIndex()){
+                        println("$i) ${card.getName()} A:${card.getAtack()} D:${card.getDefense()}")
+                    }
+                    print("Escolher: ")
+                    var option = readln().toInt()
+                    var c = playerTwo.getCardsOnHand()[option]
+                    println()
+                    print("Substituir a carta:")
+                    option = readln().toInt()
+                    var cc = this.playerTwo.getCardsInGame()[option]
+                    this.playerTwo.setCardsDestroyed(cc)
+                    this.playerTwo.getCardsInGame().add(c)
+                    this.playerTwo.setCardOnHand(cc)
+                    println("Troca realizada")
+                    println("Modificar modo:")
+                    println("1-Ataque 2-Defesa")
+                    option = readln().toInt()
+                    if(option == 1){
+                        this.playerTwo.getCardsInGame().last().setModeAtack(true)
+                    }else{
+                        this.playerTwo.getCardsInGame().last().setModeAtack(false)
+                    }
+                    this.showPlayersCards(this.playerOne.getCardsInGame(), this.playerTwo.getCardsInGame())
+                }
+                else{
+                    println("Sem cartas na mao, ainda")
+                }
+                this.playerTwosTurn(player, enemy)
+
+            }
+            6 -> this.playerOnesTurn(this.p1C, this.p2C)
         }
     }
 
@@ -227,29 +317,28 @@ class ArenaController:AbstractArena() {
                             val o = readln().toInt()
                             if(o in options){
                                 val c = player.getOneCard(o)
-                            println()
-                            print("Equipar a carta número: ")
-                            val oo = readln().toInt()
-                            println("P1: Informacoes da carta antes: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
-                            if(c.getAtack() != 0){
-                                player.getCardsInGame(oo).setAttack(c.getAtack())
-                                player.setCardsDestroyed(c) // a carta de equipamento é destruída, ao ser equipada
-                            }else{
-                                player.getCardsInGame(oo).setDefense(c.getDefense())
+                                println()
+                                print("Equipar a carta número: ")
+                                val oo = readln().toInt()
+                                println("P1: Informacoes da carta antes: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
+                                if(c.getAtack() != 0){
+                                    player.getCardsInGame(oo).setAttack(c.getAtack())
+                                }else{
+                                    player.getCardsInGame(oo).setDefense(c.getDefense())
+                                }
+                                println("P1: Informacoes da carta depois: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
+                                println("Player1 Equipado")
+                                this.newRoundP1 = true
                                 player.setCardsDestroyed(c) // a carta de equipamento é destruida, ao ser equipada
-                            }
-                            println("P1: Informacoes da carta depois: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
-                            println("Player1 Equipado")
-                            this.newRoundP1 = true
+                                this.showPlayersCards(this.playerOne.getCardsInGame(),
+                                    this.playerTwo.getCardsInGame())
                                 this.playerOnesTurn(this.p1C, this.p2C)
                                 break
                             }else{
-                                    this.playerOnesTurn(this.p1C, this.p2C)
-                                    break
-
-                        }
-
-
+                                println("Opcao invalida")
+                                this.playerOnesTurn(this.p1C, this.p2C)
+                                break
+                            }
                     }else {
                             println("Voce ja equipou uma carta neste round")
                             this.playerOnesTurn(this.p1C, this.p2C)
@@ -262,11 +351,7 @@ class ArenaController:AbstractArena() {
         }
         else{
             println("Voce nao tem cartas equipamentos")
-            if(player.getOption() == 1){
-                this.playerOnesTurn(this.p1C, this.p2C)
-            }else{
-                this.playerTwosTurn(this.p2C, this.p1C)
-            }
+            this.playerOnesTurn(this.p1C, this.p2C)
         }
     }
 
@@ -283,11 +368,11 @@ class ArenaController:AbstractArena() {
         if(!options.isEmpty()){
             while(true){
                 try{
-                        if(!this.newRoundP2){
-                            print("\nEscolha: ")
-                            val o = readln().toInt()
-                            if(o in options){
-                                val c = player.getOneCard(o)
+                    if(!this.newRoundP2){
+                        print("\nEscolha: ")
+                        val o = readln().toInt()
+                        if(o in options){
+                            val c = player.getOneCard(o)
                             print("Equipar a carta número: ")
                             val oo = readln().toInt()
                             println("P2: Informacoes da carta antes: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
@@ -301,16 +386,17 @@ class ArenaController:AbstractArena() {
                             println("P2: Informacoes da carta depois: ${player.getCardsInGame(oo).getName()} A:${player.getCardsInGame(oo).getAtack()} D:${player.getCardsInGame(oo).getDefense()}")
                             println("Player2 Equipado")
                             this.newRoundP2 = true
-                                this.playerTwosTurn(this.p2C, this.p1C)
-                                break
+                            this.playerTwosTurn(this.p2C, this.p1C)
+                            break
                         }else{
-                            println("Voce ja equipou uma carta neste round")
-
-                                    this.playerTwosTurn(this.p2C, this.p1C)
-                                    break
-
+                            println("Opcao invalida")
+                            this.playerTwosTurn(this.p2C, this.p1C)
+                            break
                         }
-
+                    }else{
+                        println("Voce ja equipou uma carta neste round")
+                        this.playerTwosTurn(this.p2C, this.p1C)
+                        break
                     }
                 }catch (e: Exception){
                     continue
@@ -319,11 +405,7 @@ class ArenaController:AbstractArena() {
         }
         else{
             println("Voce nao tem cartas equipamentos")
-            if(player.getOption() == 1){
-                this.playerOnesTurn(this.p1C, this.p2C)
-            }else{
-                this.playerTwosTurn(this.p2C, this.p1C)
-            }
+            this.playerTwosTurn(this.p2C, this.p1C)
         }
     }
 
@@ -368,12 +450,12 @@ class ArenaController:AbstractArena() {
             println("1 - Atacar jogador 2")
             println("2 - Defender do jogador 2")
             println("3 - Equipar monstro")
-            println("4 - Pegar nova carta")
-            println("5 - Verificar pontuação")
-            println("6 - Verificar cards do oponente em campo")
+            println("4 - Verificar pontuação")
+            println("5 - Trazer carta da mão para o tabuleiro")
+            println("6 - Passar a vez")
             println("0 - Sair do jogo")
             print("->")
-            val option = readln().toIntOrNull() ?: 0
+            val option = readln().toIntOrNull() ?: -1
             if (option == 0){
                 println("Player2 Venceu devido a desistencia do Player1")
                 exitProcess(0)
@@ -393,9 +475,8 @@ class ArenaController:AbstractArena() {
             println("1 - Atacar jogador 1")
             println("2 - Defender do jogador 1")
             println("3 - Equipar monstro")
-            println("4 - Pegar nova carta")
-            println("5 - Verificar pontuação")
-            println("6 - Verificar cards do oponente em campo")
+            println("4 - Verificar pontuação")
+            println("5 - Trazer carta da mão para o tabuleiro")
             println("0 - Sair do jogo")
             print("->")
             val option = readln().toIntOrNull() ?: -1
@@ -444,8 +525,6 @@ class ArenaController:AbstractArena() {
             playerTwo.setOption(2)
         }
         if(firstPlayerChoiced == 2) {
-            playerOne.setOption(2)
-            playerTwo.setOption(1)
             val f = firstDistribuition.subList(5, 10)
             this.playerOne = Player(f)
             this.playerOne.setTotalCards(5)
@@ -454,6 +533,8 @@ class ArenaController:AbstractArena() {
             this.playerTwo = Player(s)
             this.playerTwo.setTotalCards(5)
             this.playerTwo.setCardsInGame(s)
+            playerOne.setOption(2)
+            playerTwo.setOption(1)
         }
         println("Players has been created!")
         val index: Vector<Int> = used(firstDistribuition)
@@ -468,6 +549,7 @@ class ArenaController:AbstractArena() {
         println(Draw.loseText())
     }
 
+    // inicia o novo round, resetando os modos das cartas
     override fun nextRound() {
         this.newRoundP1 = false
         this.newRoundP2 = false
@@ -475,6 +557,27 @@ class ArenaController:AbstractArena() {
         this.createBanner()
         setPlayerCardMode(this.playerOne)
         setPlayerCardMode(this.playerTwo)
+
+        // distribuir nova carta aos jogadores
+        try {
+            val mapCard = this.deck.toDistributeNext(this.indexNext).values.toList()[0]
+            this.indexNext++
+            val mapCard2 = this.deck.toDistributeNext(this.indexNext).values.toList()[0]
+            this.indexNext++
+            println("Carta ${mapCard.getName()} adicionada ao baralho do player1")
+            println("Carta ${mapCard2.getName()} adicionada ao baralho do player2")
+            this.playerOne.setCardOnHand(mapCard)
+            this.playerTwo.setCardOnHand(mapCard2)
+            if(this.playerOne.getCardsInGame().size < 5){
+                this.playerOne.getCardsInGame().add(mapCard)
+            }
+            if(this.playerTwo.getCardsInGame().size < 5){
+                this.playerTwo.getCardsInGame().add(mapCard)
+            }
+        }catch (e: Exception){
+            finish()
+        }
+
     }
 
     // identifica as cartas usadas e retorna vector com as posicoes
@@ -492,6 +595,7 @@ class ArenaController:AbstractArena() {
     }
 
     private fun createBanner(){
+        this.finish()
         println("---".repeat(20))
         println("PLAYER1: ${this.playerOne.getPunctuation()} PONTOS")
         println("PLAYER2: ${this.playerTwo.getPunctuation()} PONTOS")
@@ -552,7 +656,7 @@ class ArenaController:AbstractArena() {
                     1 -> c.setModeAtack(true)
                     2 -> c.setModeAtack(false)
                 }
-                player.backCardToDeck(c, opcaoI)
+                player.backCardToDeck(c, index)
             }
         }
         println()
@@ -564,23 +668,27 @@ class ArenaController:AbstractArena() {
        o vencedor do jogo.
      */
     private fun finish(){
-        if(this.playerOne.getPunctuation() == 0){
+        if(this.playerOne.getPunctuation() <= 0){
             println("PLAYER2: ")
-            Draw.winText()
+            println(Draw.winText())
+            println(Draw.createPlayerOne())
             exitProcess(0)
-        }else if(this.playerTwo.getPunctuation() == 0) {
+        }else if(this.playerTwo.getPunctuation() <= 0) {
             println("PLAYER1: ")
-            Draw.winText()
+            println(Draw.winText())
+            println(Draw.createPlayerTwo())
             exitProcess(0)
         }
         if(this.deck.getCards().isEmpty()){
             if(this.playerOne.getPunctuation() > this.playerTwo.getPunctuation()){
                 println("PLAYER1: ")
-                Draw.winText()
+                println(Draw.winText())
+                println(Draw.createPlayerOne())
                 exitProcess(0)
             }else{
                 println("PLAYER2: ")
-                Draw.winText()
+                println(Draw.winText())
+                println( Draw.createPlayerTwo())
                 exitProcess(0)
             }
         }

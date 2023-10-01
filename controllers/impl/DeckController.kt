@@ -5,14 +5,14 @@ import br.com.ifmg.battlecardgame.models.Card
 import br.com.ifmg.battlecardgame.models.Deck
 import java.util.Vector
 
-class DeckController(private var cards: MutableList<Map<String, Card>>): IDeck {
+class DeckController(private var cards: MutableList<Map<String, Card>>) : IDeck {
     private var deck: Deck = Deck(cards)
-    private val arenaCards:MutableList<Map<String, Card>> = this.deck.getCards()
+    private val arenaCards: MutableList<Map<String, Card>> = this.deck.getCards()
 
     override fun shuffle(used: Vector<Int>): MutableList<Map<String, Card>> {
-        for(i in used){
-            for(j in (0..this.arenaCards.size)){
-                if(i == j){
+        for (i in used) {
+            for (j in (0..this.arenaCards.size)) {
+                if (i == j) {
                     this.arenaCards.removeAt(j)
                 }
             }
@@ -25,11 +25,11 @@ class DeckController(private var cards: MutableList<Map<String, Card>>): IDeck {
         return this.arenaCards.subList(0, amount)
     }
 
-    public fun toDistributeNext(next: Int): Map<String, Card>{
-        try{
+    public fun toDistributeNext(next: Int): Map<String, Card> {
+        try {
             return this.arenaCards[next]
-        }catch (e: Exception){
-            throw(Exception("Terminou o baralho"))
+        } catch (e: Exception) {
+            throw (Exception("Terminou o baralho"))
         }
     }
 
@@ -38,15 +38,15 @@ class DeckController(private var cards: MutableList<Map<String, Card>>): IDeck {
         this.cards.shuffle()
     }
 
-    public fun finishCards(): Boolean{
+    public fun finishCards(): Boolean {
         return this.arenaCards.isEmpty()
     }
 
-    public fun setCards(ncards: MutableList<Map<String, Card>>){
+    public fun setCards(ncards: MutableList<Map<String, Card>>) {
         this.cards = ncards
     }
 
-    public fun getCards(): MutableList<Map<String, Card>>{
+    public fun getCards(): MutableList<Map<String, Card>> {
         return this.cards
     }
 }

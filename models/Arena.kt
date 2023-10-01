@@ -9,16 +9,8 @@ import br.com.ifmg.battlecardgame.tools.Tools
 * */
 class Arena {
     private var cards: MutableList<Map<String, Card>> = Tools.getCards()
-    private var playerOne: Player = Player(cards)
-    private var playerTwo: Player = Player(cards)
 
-    public fun getPlayerOne(): Player{
-        this.playerOne.setOption(1)
-        return this.playerOne
-    }
-
-    public fun getPlayerTwo(): Player{
-        this.playerTwo.setOption(2)
-        return this.playerTwo
+    public fun getCards(): MutableList<Map<String, Card>>{
+        return this.cards
     }
 }

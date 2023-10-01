@@ -11,20 +11,31 @@ import java.lang.Error
 * contém uma lista de cartas em jogo.
 * contém uma lista de cartas que foram destruídas.
 * */
-class Player(private var cards: MutableList<Map<String, Card>>) {
+class Player(var cards: MutableList<Map<String, Card>>) {
     private final val NUM_MAX_CARDS_BY_HAND: Int = 10
     private var punctuation: Int = 10000
     private var totalCards: Int = 0
-    private lateinit var cardsInGame: MutableList<Card>
-    private lateinit var cardsDestroyed: MutableList<Card>
+    private var cardsInGame = mutableListOf<Card>()
+    private var cardsDestroyed = mutableListOf<Card>()
     private var option: Int = 0 // qual player 1 or 2
 
     public fun getPunctuation(): Int{
         return this.punctuation
     }
 
+    public fun getCardsDestroyed(): MutableList<Card>{
+        return this.cardsDestroyed
+    }
+
+    public fun setCardsDestroyed(card: Card){
+        println("Adicionando ${card.getName()} a lista de cartas destruidas")
+        this.totalCards--
+        this.cardsInGame.remove(card)
+        this.cardsDestroyed.add(card)
+    }
+
     public fun setPunctuation(newPunctuation: Int){
-        this.punctuation = newPunctuation
+        this.punctuation -= newPunctuation
     }
 
     public fun getTotalCards(): Int{
@@ -32,7 +43,7 @@ class Player(private var cards: MutableList<Map<String, Card>>) {
     }
 
     public fun setTotalCards(newTotal: Int){
-        this.totalCards = newTotal
+        this.totalCards += newTotal
     }
 
     public fun getCardsInGame(index: Int): Card{
@@ -42,6 +53,18 @@ class Player(private var cards: MutableList<Map<String, Card>>) {
         throw Error("Escolha de carta incorreta")
     }
 
+    public fun getCardsInGame(): MutableList<Card>{
+        return this.cardsInGame
+    }
+
+    public fun setCardsInGame(subCards: MutableList<Map<String, Card>>):Unit {
+        for(map in subCards){
+            for((_, v) in map){
+                this.cardsInGame.add(v)
+            }
+        }
+    }
+
     public fun getOption(): Int{
         return this.option
     }
@@ -49,4 +72,13 @@ class Player(private var cards: MutableList<Map<String, Card>>) {
     public fun setOption(newOption: Int){
         this.option = newOption
     }
+
+    public fun getOneCard(cardIndex: Int): Card{
+        return this.cardsInGame[cardIndex]
+    }
+
+    public fun backCardToDeck(card: Card, cardIndex: Int){
+        this.cardsInGame[cardIndex] = card
+    }
+
 }

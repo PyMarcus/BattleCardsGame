@@ -45,4 +45,12 @@ data class Card (
     public fun setModeAtack(mode: Boolean){
         this.modeAtack = mode
     }
+
+    public fun setAttack(newValue: Int){
+        this.atack += newValue
+    }
+
+    public fun setDefense(newValue: Int){
+        this.defense += newValue
+    }
 }

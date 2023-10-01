@@ -3,6 +3,7 @@ package br.com.ifmg.battlecardgame.tools
 import java.io.File
 import java.io.InputStream
 import br.com.ifmg.battlecardgame.models.Card
+import java.util.Scanner
 
 
 /*
@@ -56,19 +57,52 @@ class Tools {
         }
 
         // trata entrada da escolha de jogador
-        public fun entry(): Int{
-            var entry: Int = 0
-            print(": ")
-            while(entry != 1 || entry != 2){
-                println("Please, choice 1 or 2!")
-                try{
-                    entry = readln().toInt()
-                }catch (e: Exception){
-                    continue
+        fun entry(): Int {
+            val scanner = Scanner(System.`in`)
+            var input = 0
+            println()
+            while (true) {
+                print("Escolha -> ")
+                try {
+                    input = scanner.nextInt()
+
+                    if (input == 1 || input == 2) {
+                        println("OK")
+                        break
+                    } else {
+                        println("Invalid input. Please choose 1 or 2.")
+                    }
+                } catch (e: Exception) {
+                    println("Invalid input. Please choose 1 or 2.")
+                    scanner.nextLine() // Limpar o buffer de entrada após uma exceção
                 }
             }
-            return entry
+
+            return input
         }
 
+        fun entryMode(): Int{
+            val scanner = Scanner(System.`in`)
+            var input = 0
+
+            while (true) {
+                print("Escolha a carta -> ")
+                try {
+                    input = scanner.nextInt()
+
+                    if (input in 0..5) {  // so pode ter até 5 cartas em jogo, então.
+                        println("OK")
+                        break
+                    } else {
+                        println("Invalid input. Please choose 1 or 2.")
+                    }
+                } catch (e: Exception) {
+                    println("Invalid input. Please choose 1 or 2.")
+                    scanner.nextLine() // Limpar o buffer de entrada após uma exceção
+                }
+        }
+            return input
+
+        }
     }
 }

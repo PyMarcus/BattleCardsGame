@@ -4,29 +4,49 @@ import br.com.ifmg.battlecardgame.controllers.IPlayer
 import br.com.ifmg.battlecardgame.models.Card
 import br.com.ifmg.battlecardgame.models.Player
 
-class PlayerController(private val currentPlayer: Player,
-                       private var myCardChoiced: Int): IPlayer {
+class PlayerController(private val currentPlayer: Player): IPlayer {
+
+    public fun getCurrentPlayer(): Player{
+        return this.currentPlayer
+    }
 
     // ataca o inimigo com a posicao de carta escolhida no tabuleiro
     // verifica, conforme as regras, se a condição de ataque é possível
-    override fun atack(playerEnemy: Player, cardEnemy: Int): Boolean {
-        println("Attack from player${currentPlayer.getOption()} " +
-                "on player: ${playerEnemy.getOption()}")
+    override fun atack(playerEnemy: Player, myCardChoose: Int, cardEnemy: Int): Boolean {
+        println("Ataque do player${currentPlayer.getOption()} " +
+                "sobre player: ${playerEnemy.getOption()}")
         val card: Card = playerEnemy.getCardsInGame(cardEnemy)
-        if(card.getDefense() <= currentPlayer.getCardsInGame(myCardChoiced).getAtack()){
-            return true
+        println("INFORMACOES DA CARTA player${playerEnemy.getOption()}: ${card.getName()} D:${card.getDefense()} " +
+                "A:${card.getAtack()} M ${card.getModeAtack()}")
+        println("INFORMACOES DA CARTA player${currentPlayer.getOption()}: ${currentPlayer.getCardsInGame(myCardChoose).getName()} D:${currentPlayer.getCardsInGame(myCardChoose).getDefense()} " +
+                "A:${currentPlayer.getCardsInGame(myCardChoose).getAtack()} M ${currentPlayer.getCardsInGame(myCardChoose).getModeAtack()}")
+        if(currentPlayer.getCardsInGame(myCardChoose).getModeAtack()){
+            if(card.getDefense() <= currentPlayer.getCardsInGame(myCardChoose).getAtack()){
+                return true
+            }
+        }else{
+            println("Esta carta ${currentPlayer.getCardsInGame(myCardChoose).getName()} nao esta em modo ataque.")
         }
+
         return false
     }
 
     // defende do inimigo com a posicao de carta escolhida no tabuleiro
     // verifica, conforme as regras, se a condição de ataque é possível
-    override fun defend(playerEnemy: Player, enemyCard: Int): Boolean {
-        println("Defense of player${currentPlayer.getOption()} " +
-                "from player: ${playerEnemy.getOption()}")
+    override fun defend(playerEnemy: Player, myCardChoose: Int, enemyCard: Int): Boolean {
+        println("Defesa do player${currentPlayer.getOption()} " +
+                "sobre o player: ${playerEnemy.getOption()}")
         val card: Card = playerEnemy.getCardsInGame(enemyCard)
-        if(card.getAtack() <= currentPlayer.getCardsInGame(myCardChoiced).getDefense()){
-            return true
+        println("INFORMACOES DA CARTA player${playerEnemy.getOption()}: ${card.getName()} D:${card.getDefense()} " +
+                "A:${card.getAtack()} M ${card.getModeAtack()}")
+        println("INFORMACOES DA CARTA player${currentPlayer.getOption()}: ${currentPlayer.getCardsInGame(myCardChoose).getName()} D:${currentPlayer.getCardsInGame(myCardChoose).getDefense()} " +
+                "A:${currentPlayer.getCardsInGame(myCardChoose).getAtack()} M ${currentPlayer.getCardsInGame(myCardChoose).getModeAtack()}")
+        if(!currentPlayer.getCardsInGame(myCardChoose).getModeAtack()){
+            if(card.getAtack() <= currentPlayer.getCardsInGame(myCardChoose).getDefense()){
+                return true
+            }
+        }else{
+            println("Esta carta: ${currentPlayer.getCardsInGame(myCardChoose).getName()} nao esta em modo defesa.")
         }
         return false
     }

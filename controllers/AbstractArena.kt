@@ -1,7 +1,7 @@
 package br.com.ifmg.battlecardgame.controllers
 
 import br.com.ifmg.battlecardgame.models.Player
-import br.com.ifmg.battlecardgame.tools.Draw
+import br.com.ifmg.battlecardgame.views.Draw
 
 abstract class AbstractArena {
     open fun welcomeToGame(){
